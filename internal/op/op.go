@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/1password/onepassword-sdk-go"
 )
@@ -39,7 +40,25 @@ func NewClient(ctx context.Context, account, integrationVersion string) (*onepas
 		}
 		opts = append(opts, onepassword.WithDesktopAppIntegration(account))
 	}
-	return onepassword.NewClient(ctx, opts...)
+	client, err := onepassword.NewClient(ctx, opts...)
+	if err != nil {
+		return nil, wrapInitError(err, account)
+	}
+	return client, nil
+}
+
+// wrapInitError turns SDK client-initialization failures into actionable
+// guidance, most notably the account-mismatch case: the 1Password SDK matches
+// accounts by name or account UUID, whereas the op CLI also accepts the user
+// UUID, which users often have in OP_ACCOUNT.
+func wrapInitError(err error, account string) error {
+	if strings.Contains(err.Error(), "Account not found") {
+		return fmt.Errorf(
+			"1Password account %q not found: the SDK matches accounts by the name shown in the desktop app sidebar or the account UUID — "+
+				"not the user UUID that the op CLI also accepts in OP_ACCOUNT; run `op account list --format json` for the account_uuid",
+			account)
+	}
+	return err
 }
 
 // SecretsResolver is the slice of the 1Password SDK client that Fetch needs.

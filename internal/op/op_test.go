@@ -2,6 +2,7 @@ package op
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"testing"
 
@@ -150,6 +151,25 @@ func TestNewClientRequiresAccountForDesktopAuth(t *testing.T) {
 	_, err := NewClient(context.Background(), "", "test")
 	if err == nil || !strings.Contains(err.Error(), "--account") {
 		t.Errorf("expected missing-account error, got %v", err)
+	}
+}
+
+func TestWrapInitErrorAccountNotFound(t *testing.T) {
+	err := wrapInitError(errors.New("error initializing client: Error { msg: Account not found, inner: None }"), "72TA6DTYDJFNXMIBYK7CIISNFY")
+	if err == nil {
+		t.Fatal("expected an error")
+	}
+	for _, want := range []string{"72TA6DTYDJFNXMIBYK7CIISNFY", "account UUID", "user UUID", "op account list"} {
+		if !strings.Contains(err.Error(), want) {
+			t.Errorf("error %q does not mention %q", err, want)
+		}
+	}
+}
+
+func TestWrapInitErrorPassthrough(t *testing.T) {
+	inner := errors.New("some other failure")
+	if err := wrapInitError(inner, "acct"); err != inner {
+		t.Errorf("expected passthrough, got %v", err)
 	}
 }
 

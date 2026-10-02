@@ -58,6 +58,10 @@ Two modes, picked automatically:
   `--account` (or `OP_ACCOUNT`): the account name shown at the top of the
   app's sidebar, or the account UUID. The SDK does not auto-select an account,
   so this is required, not cosmetic.
+  **Gotcha:** the SDK does *not* accept the *user* UUID that the `op` CLI
+  happily takes in `OP_ACCOUNT` — if `OP_ACCOUNT` holds one you will get
+  "Account not found". Run `op account list --format json` and use the
+  `account_uuid` (or pass `--account` explicitly, which overrides the env).
 - **Service account**: set `OP_SERVICE_ACCOUNT_TOKEN` to authenticate for CI
   and automation. Service accounts belong to a single 1Password account
   already, so `--account` must be unset in this mode.
