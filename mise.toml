@@ -1,0 +1,28 @@
+[tools]
+go = "1.27"
+golangci-lint = "latest"
+
+[tasks.build]
+description = "Build a debug binary into bin/"
+run = "go build -o bin/op-s3-credentials.exe ./cmd/op-s3-credentials"
+
+# Bump the -X main.version value when cutting a release (goreleaser can inject this later).
+[tasks."build:release"]
+description = "Build an optimized release binary into bin/"
+run = 'go build -trimpath -ldflags "-s -w -X main.version=v0.1.0" -o bin/op-s3-credentials.exe ./cmd/op-s3-credentials'
+
+[tasks.test]
+description = "Run unit tests"
+run = "go test ./..."
+
+[tasks.lint]
+description = "Run golangci-lint"
+run = "golangci-lint run"
+
+[tasks.fmt]
+description = "Format source files"
+run = "gofmt -w ."
+
+[tasks.install]
+description = "Install the binary to GOBIN"
+run = "go install ./cmd/op-s3-credentials"
