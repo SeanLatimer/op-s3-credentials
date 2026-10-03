@@ -6,9 +6,12 @@ and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-03
+
 ### Added
 
-- AWS `credential_process` helper backed by the official 1Password Go SDK.
-- Desktop-app and service-account authentication, configurable credential fields,
-  and an explicitly selected optional session-token field.
-- A hard timeout for SDK operations, including blocked desktop-app handshakes.
+- Emit AWS `credential_process` JSON from 1Password items.
+
+### Fixed
+
+- Give an actionable error when `OP_ACCOUNT` holds a user UUID.
