@@ -19,14 +19,83 @@ written to disk.
 ## Installation
 
 Prebuilt binaries are published for Linux, macOS, and Windows (amd64 and
-arm64):
+arm64). Choose one installation method below.
 
-- **Homebrew**: `brew install SeanLatimer/tap/op-s3-credentials`
-- **Scoop**: `scoop bucket add SeanLatimer https://github.com/SeanLatimer/scoop-bucket && scoop install op-s3-credentials`
-- **mise**: `mise use -g ubi:SeanLatimer/op-s3-credentials`
-- **Manual**: download from [releases](https://github.com/SeanLatimer/op-s3-credentials/releases) — archives are named `op-s3-credentials_<os>_<arch>`
+### mise (Windows, macOS, Linux)
 
-Or from source: `go install github.com/SeanLatimer/op-s3-credentials/cmd/op-s3-credentials@latest`.
+Install a current [mise](https://mise.jdx.dev/getting-started.html) with the
+Packslip backend, then run:
+
+```text
+mise use -g packslip:github.com/SeanLatimer/op-s3-credentials@0.1.1
+mise exec -- op-s3-credentials --version
+```
+
+Packslip verifies the signed release manifest and selected archive's digest.
+No registry shorthand or plugin is needed. To track the latest release, replace
+`@0.1.1` with `@latest`. mise's default minimum release age is 24 hours, so a
+just-published release may not be available immediately.
+
+Activate mise in your shell as described in its setup guide to run
+`op-s3-credentials` directly, or use `mise exec --` as above. Find the installed
+executable's absolute path with:
+
+```text
+mise which op-s3-credentials
+```
+
+Use that path in AWS `credential_process` rather than relying on an interactive
+shell's mise activation. If you install a different version, check the path
+again and update your AWS config.
+
+### Scoop (Windows)
+
+With [Scoop](https://scoop.sh) installed, run in PowerShell:
+
+```powershell
+scoop bucket add SeanLatimer https://github.com/SeanLatimer/scoop-bucket
+scoop install op-s3-credentials
+op-s3-credentials --version
+```
+
+### Homebrew (macOS)
+
+With [Homebrew](https://brew.sh) installed:
+
+```sh
+brew install --cask SeanLatimer/tap/op-s3-credentials
+op-s3-credentials --version
+```
+
+### Manual download
+
+Download the archive for your platform from
+[releases](https://github.com/SeanLatimer/op-s3-credentials/releases):
+
+| Platform | Archive |
+| --- | --- |
+| Windows | `op-s3-credentials_windows_<arch>.zip` |
+| macOS | `op-s3-credentials_darwin_<arch>.tar.gz` |
+| Linux | `op-s3-credentials_linux_<arch>.tar.gz` |
+
+Use `amd64` for x86-64 or `arm64` for ARM64. Linux binaries target glibc, not
+musl-based distributions such as Alpine. Follow [signature verification](#verifying-releases)
+before extracting the binary into a directory of your choice. Windows uses
+`op-s3-credentials.exe`; macOS/Linux use `op-s3-credentials`. Run the binary with
+`--version`, then use its absolute path in your AWS config.
+
+### Build from source
+
+With Go installed:
+
+```text
+go install github.com/SeanLatimer/op-s3-credentials/cmd/op-s3-credentials@v0.1.1
+```
+
+The binary is installed in `GOBIN`, or `GOPATH/bin` when `GOBIN` is unset.
+Desktop-app integration on macOS/Linux requires CGO and a C compiler; Windows
+does not require CGO. Source builds report `dev` unless the version is injected
+at build time; use a release binary for the published version identifier.
 
 ## 1Password setup
 

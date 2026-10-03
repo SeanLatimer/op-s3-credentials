@@ -134,7 +134,9 @@ availability and quotas may change, and generation can consume multiple requests
   `checksums.txt.sigstore.json`, and `packslip.sigstore.json` exist on the release.
 - Follow the README's signature-verification instructions and smoke-test the
   binary's `--version` and the actual credential-process integration.
-- Verify Homebrew/Scoop manifests and test `mise use -g ubi:SeanLatimer/op-s3-credentials`.
+- Verify Homebrew/Scoop manifests and test installation via
+  `mise use -g packslip:github.com/SeanLatimer/op-s3-credentials@VERSION`, using
+  the published version. Allow for mise's default minimum release age of 24 hours.
 - Confirm the CLI version matches the reviewed tag. Review the final release body.
 - If macOS/CGO builds fail, inspect the macOS runner log; do not drop platforms
   silently. If tap/bucket publishing fails, check token expiry and Contents access.
