@@ -130,8 +130,8 @@ availability and quotas may change, and generation can consume multiple requests
 
 ## Verify and recover
 
-- Confirm six archives (Linux/macOS/Windows × amd64/arm64), `checksums.txt`, its
-  signature/certificate, and `packslip.sigstore.json` exist on the release.
+- Confirm six archives (Linux/macOS/Windows × amd64/arm64), `checksums.txt`,
+  `checksums.txt.sigstore.json`, and `packslip.sigstore.json` exist on the release.
 - Follow the README's signature-verification instructions and smoke-test the
   binary's `--version` and the actual credential-process integration.
 - Verify Homebrew/Scoop manifests and test `mise use -g ubi:SeanLatimer/op-s3-credentials`.
