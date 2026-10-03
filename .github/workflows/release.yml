@@ -10,7 +10,9 @@ permissions:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    # macOS runner: darwin CGO needs Apple frameworks, so it must build
+    # natively with clang; linux cross-compiles via zig, windows needs no CGO.
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v5
         with:
@@ -26,7 +28,7 @@ jobs:
       - name: Build and publish
         # zig cross-compiles CGO for darwin/linux; windows needs no CGO.
         # cosign signs checksums.txt keylessly via the job's OIDC identity.
-        run: mise x -t goreleaser -t zig -t cosign -- goreleaser release --clean
+        run: mise x goreleaser zig cosign -- goreleaser release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
