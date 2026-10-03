@@ -11,8 +11,8 @@ import (
 
 	"github.com/urfave/cli/v3"
 
-	"github.com/seanlatimer/op-s3-credentials/internal/awsprocess"
-	"github.com/seanlatimer/op-s3-credentials/internal/op"
+	"github.com/SeanLatimer/op-s3-credentials/internal/awsprocess"
+	"github.com/SeanLatimer/op-s3-credentials/internal/op"
 )
 
 // CredentialFetcher resolves AWS credentials from 1Password. It is an

@@ -21,12 +21,12 @@ written to disk.
 Prebuilt binaries are published for Linux, macOS, and Windows (amd64 and
 arm64):
 
-- **Homebrew**: `brew install seanlatimer/tap/op-s3-credentials`
-- **Scoop**: `scoop bucket add seanlatimer https://github.com/seanlatimer/scoop-bucket && scoop install op-s3-credentials`
-- **mise**: `mise use -g ubi:seanlatimer/op-s3-credentials`
-- **Manual**: download from [releases](https://github.com/seanlatimer/op-s3-credentials/releases) — archives are named `op-s3-credentials_<os>_<arch>`
+- **Homebrew**: `brew install SeanLatimer/tap/op-s3-credentials`
+- **Scoop**: `scoop bucket add SeanLatimer https://github.com/SeanLatimer/scoop-bucket && scoop install op-s3-credentials`
+- **mise**: `mise use -g ubi:SeanLatimer/op-s3-credentials`
+- **Manual**: download from [releases](https://github.com/SeanLatimer/op-s3-credentials/releases) — archives are named `op-s3-credentials_<os>_<arch>`
 
-Or from source: `go install github.com/seanlatimer/op-s3-credentials/cmd/op-s3-credentials@latest`.
+Or from source: `go install github.com/SeanLatimer/op-s3-credentials/cmd/op-s3-credentials@latest`.
 
 ## 1Password setup
 

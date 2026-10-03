@@ -105,10 +105,10 @@ changelog:
 homebrew_casks:
   - name: op-s3-credentials
     repository:
-      owner: seanlatimer
+      owner: SeanLatimer
       name: homebrew-tap
       token: '{{ .Env.TAP_GITHUB_TOKEN }}'
-    homepage: https://github.com/seanlatimer/op-s3-credentials
+    homepage: https://github.com/SeanLatimer/op-s3-credentials
     description: AWS credential_process helper backed by 1Password
     # Binaries are not Apple-signed/notarized; clear the quarantine bit so
     # macOS does not report the binary as damaged.
@@ -124,10 +124,10 @@ homebrew_casks:
 
 scoops:
   - repository:
-      owner: seanlatimer
+      owner: SeanLatimer
       name: scoop-bucket
       token: '{{ .Env.TAP_GITHUB_TOKEN }}'
-    homepage: https://github.com/seanlatimer/op-s3-credentials
+    homepage: https://github.com/SeanLatimer/op-s3-credentials
     description: AWS credential_process helper backed by 1Password
     license: MIT
     commit_author:
