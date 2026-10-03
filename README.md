@@ -58,10 +58,17 @@ Two modes, picked automatically:
   `--account` (or `OP_ACCOUNT`): the account name shown at the top of the
   app's sidebar, or the account UUID. The SDK does not auto-select an account,
   so this is required, not cosmetic.
-  **Gotcha:** the SDK does *not* accept the *user* UUID that the `op` CLI
-  happily takes in `OP_ACCOUNT` — if `OP_ACCOUNT` holds one you will get
-  "Account not found". Run `op account list --format json` and use the
-  `account_uuid` (or pass `--account` explicitly, which overrides the env).
+  **Gotcha:** `OP_ACCOUNT` does not accept the *user* UUID. This is a
+  1Password Go SDK limitation, not a choice in this tool: the SDK matches
+  accounts by sidebar name or account UUID only (`Account not found`
+  otherwise), and every SDK-based integration inherits that strictness —
+  including the onepassword Terraform provider v3.x. Only op-CLI-backed tools
+  (the op CLI itself, Terraform provider v1/v2) accept user UUIDs, emails, and
+  URLs — which is why the user UUID is the identifier people end up with:
+  `op account list` prints the *user* UUID in its default output and hides the
+  account UUID unless `--format json` is used. Run
+  `op account list --format json` and use the `account_uuid` (an explicit
+  `--account` flag also overrides the environment variable).
 - **Service account**: set `OP_SERVICE_ACCOUNT_TOKEN` to authenticate for CI
   and automation. Service accounts belong to a single 1Password account
   already, so `--account` must be unset in this mode.
