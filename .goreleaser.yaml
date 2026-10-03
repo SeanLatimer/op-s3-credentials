@@ -62,22 +62,18 @@ archives:
 checksum:
   name_template: 'checksums.txt'
 
-# Keyless cosign signing of the checksum file; the signature and certificate
-# are uploaded beside it. packslip separately signs every artifact's digest
+# Keyless cosign signing of the checksum file; its Sigstore bundle
+# is uploaded beside it. packslip separately signs every artifact's digest
 # with the same workflow identity.
 signs:
   - cmd: cosign
     artifacts: checksum
-    signature: '${artifact}.sig'
-    certificate: '${artifact}.pem'
+    signature: '${artifact}.sigstore.json'
     output: true
     args:
       - sign-blob
       - '--yes'
-      - '--output-signature'
-      - '${signature}'
-      - '--output-certificate'
-      - '${certificate}'
+      - '--bundle=${signature}'
       - '${artifact}'
 
 changelog:

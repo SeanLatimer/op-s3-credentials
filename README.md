@@ -117,19 +117,22 @@ a stuck helper forever.
 
 ## Verifying releases
 
-Every release ships `checksums.txt`, a keyless cosign signature and
-certificate (`checksums.txt.sig` / `checksums.txt.pem`), and a
+Every release ships `checksums.txt`, a keyless Cosign signature bundle
+(`checksums.txt.sigstore.json`), and a
 `packslip.sigstore.json` manifest — all signed by this repository's GitHub
 Actions identity:
 
 ```sh
 cosign verify-blob \
-  --certificate checksums.txt.pem \
-  --signature checksums.txt.sig \
-  --certificate-identity-regexp "https://github.com/SeanLatimer/op-s3-credentials" \
+  --bundle checksums.txt.sigstore.json \
+  --certificate-identity "https://github.com/SeanLatimer/op-s3-credentials/.github/workflows/release.yml@refs/tags/v0.1.1" \
   --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
   checksums.txt
 ```
+
+Use the tag of the release you downloaded in the certificate identity. After
+signature verification succeeds, compare each downloaded archive's SHA-256 hash
+against its entry in `checksums.txt`.
 
 mise reads the packslip manifest directly when installing, selecting and
 verifying artifacts from the signed digests instead of filename conventions.
