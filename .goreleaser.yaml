@@ -1,0 +1,129 @@
+# GoReleaser configuration for op-s3-credentials.
+#
+# Desktop-app authentication requires CGO on darwin/linux; the 1Password SDK
+# dlopen-s its native library, so zig cc suffices as the cross-compiler (no
+# Apple SDK needed). Windows needs no CGO at all: the desktop integration is
+# behind a `cgo || windows` build tag.
+version: 2
+
+project_name: op-s3-credentials
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: linux
+    main: ./cmd/op-s3-credentials
+    binary: op-s3-credentials
+    goos: [linux]
+    goarch: [amd64, arm64]
+    env:
+      - CGO_ENABLED=1
+      - 'CC=zig cc -target {{ if eq .Arch "amd64" }}x86_64{{ else }}aarch64{{ end }}-linux-gnu'
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags: [-trimpath]
+    ldflags: ['-s -w -X main.version={{ .Version }}']
+
+  - id: darwin
+    main: ./cmd/op-s3-credentials
+    binary: op-s3-credentials
+    goos: [darwin]
+    goarch: [amd64, arm64]
+    env:
+      - CGO_ENABLED=1
+      - 'CC=zig cc -target {{ if eq .Arch "amd64" }}x86_64{{ else }}aarch64{{ end }}-macos.11'
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags: [-trimpath]
+    ldflags: ['-s -w -X main.version={{ .Version }}']
+
+  - id: windows
+    main: ./cmd/op-s3-credentials
+    binary: op-s3-credentials
+    goos: [windows]
+    goarch: [amd64, arm64]
+    env:
+      - CGO_ENABLED=0
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags: [-trimpath]
+    ldflags: ['-s -w -X main.version={{ .Version }}']
+
+archives:
+  - ids: [linux, darwin, windows]
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
+    files: [LICENSE, README.md]
+
+checksum:
+  name_template: 'checksums.txt'
+
+# Keyless cosign signing of the checksum file; the signature and certificate
+# are uploaded beside it. packslip separately signs every artifact's digest
+# with the same workflow identity.
+signs:
+  - cmd: cosign
+    artifacts: checksum
+    signature: '${artifact}.sig'
+    certificate: '${artifact}.pem'
+    output: true
+    args:
+      - sign-blob
+      - '--yes'
+      - '--output-signature'
+      - '${signature}'
+      - '--output-certificate'
+      - '${certificate}'
+      - '${artifact}'
+
+changelog:
+  use: github
+  sort: asc
+  abbrev: 7
+  groups:
+    - title: 'Features'
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: 'Bug Fixes'
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: 'Documentation'
+      regexp: '^.*?docs(\([[:word:]]+\))??!?:.+$'
+      order: 2
+    - title: 'Other'
+      order: 999
+  filters:
+    exclude:
+      - '^test:'
+      - '^chore:'
+      - '^ci:'
+
+brews:
+  - repository:
+      owner: seanlatimer
+      name: homebrew-tap
+      token: '{{ .Env.TAP_GITHUB_TOKEN }}'
+    homepage: https://github.com/seanlatimer/op-s3-credentials
+    description: AWS credential_process helper backed by 1Password
+    license: MIT
+    commit_author:
+      name: goreleaser-bot
+      email: bot@goreleaser.com
+
+scoops:
+  - repository:
+      owner: seanlatimer
+      name: scoop-bucket
+      token: '{{ .Env.TAP_GITHUB_TOKEN }}'
+    homepage: https://github.com/seanlatimer/op-s3-credentials
+    description: AWS credential_process helper backed by 1Password
+    license: MIT
+    commit_author:
+      name: goreleaser-bot
+      email: bot@goreleaser.com
+
+release:
+  prerelease: auto
+  make_latest: true
