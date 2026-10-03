@@ -9,8 +9,8 @@ run = "go build -o bin/op-s3-credentials.exe ./cmd/op-s3-credentials"
 # Release builds are goreleaser's job (CI); this task builds every target
 # locally. mise fetches goreleaser and zig on demand.
 [tasks.snapshot]
-description = "Build all release targets locally via goreleaser snapshot"
-run = "mise x -t goreleaser -t zig -- goreleaser release --snapshot --clean"
+description = "Build release targets via goreleaser (full matrix needs macOS for darwin)"
+run = "mise x goreleaser zig -- goreleaser release --snapshot --clean"
 
 [tasks.test]
 description = "Run unit tests"

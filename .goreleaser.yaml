@@ -1,9 +1,11 @@
 # GoReleaser configuration for op-s3-credentials.
 #
-# Desktop-app authentication requires CGO on darwin/linux; the 1Password SDK
-# dlopen-s its native library, so zig cc suffices as the cross-compiler (no
-# Apple SDK needed). Windows needs no CGO at all: the desktop integration is
-# behind a `cgo || windows` build tag.
+# Desktop-app authentication requires CGO on darwin/linux. Go's darwin cgo
+# links Apple frameworks (CoreFoundation, Security), so darwin must be built
+# natively on a macOS runner with clang; cross-compiling it needs a full
+# macOS SDK. Linux cross-compiles fine with zig cc (glibc only), and windows
+# needs no CGO at all: the desktop integration is behind a `cgo || windows`
+# build tag. The release workflow therefore runs on macOS.
 version: 2
 
 project_name: op-s3-credentials
@@ -32,7 +34,7 @@ builds:
     goarch: [amd64, arm64]
     env:
       - CGO_ENABLED=1
-      - 'CC=zig cc -target {{ if eq .Arch "amd64" }}x86_64{{ else }}aarch64{{ end }}-macos.11'
+      - 'CC=clang {{ if eq .Arch "amd64" }}-arch x86_64 {{ end }}-mmacosx-version-min=11.0'
     mod_timestamp: '{{ .CommitTimestamp }}'
     flags: [-trimpath]
     ldflags: ['-s -w -X main.version={{ .Version }}']
@@ -100,14 +102,22 @@ changelog:
       - '^chore:'
       - '^ci:'
 
-brews:
-  - repository:
+homebrew_casks:
+  - name: op-s3-credentials
+    repository:
       owner: seanlatimer
       name: homebrew-tap
       token: '{{ .Env.TAP_GITHUB_TOKEN }}'
     homepage: https://github.com/seanlatimer/op-s3-credentials
     description: AWS credential_process helper backed by 1Password
-    license: MIT
+    # Binaries are not Apple-signed/notarized; clear the quarantine bit so
+    # macOS does not report the binary as damaged.
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/op-s3-credentials"]
+          end
     commit_author:
       name: goreleaser-bot
       email: bot@goreleaser.com
