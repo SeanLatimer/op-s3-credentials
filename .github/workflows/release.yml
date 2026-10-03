@@ -14,7 +14,7 @@ jobs:
     # natively with clang; linux cross-compiles via zig, windows needs no CGO.
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -23,7 +23,7 @@ jobs:
           git fetch origin +refs/heads/main:refs/remotes/origin/main
           git merge-base --is-ancestor "$GITHUB_SHA" refs/remotes/origin/main
 
-      - uses: jdx/mise-action@v2
+      - uses: jdx/mise-action@v5
 
       - name: Build and publish
         # zig cross-compiles CGO for darwin/linux; windows needs no CGO.
