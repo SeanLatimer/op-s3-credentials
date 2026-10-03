@@ -1,0 +1,38 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  id-token: write # keyless cosign signing + packslip sigstore bundle
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Refuse tags not on main
+        run: |
+          git fetch origin +refs/heads/main:refs/remotes/origin/main
+          git merge-base --is-ancestor "$GITHUB_SHA" refs/remotes/origin/main
+
+      - uses: jdx/mise-action@v2
+
+      - name: Build and publish
+        # zig cross-compiles CGO for darwin/linux; windows needs no CGO.
+        # cosign signs checksums.txt keylessly via the job's OIDC identity.
+        run: mise x -t goreleaser -t zig -t cosign -- goreleaser release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+
+      - name: Publish packslip manifest
+        uses: jdx/packslip@v1
+        with:
+          artifacts: dist/*.tar.gz dist/*.zip
+          bin: op-s3-credentials

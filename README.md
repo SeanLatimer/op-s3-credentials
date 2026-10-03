@@ -16,6 +16,18 @@ Built on the official [1Password Go SDK](https://github.com/1Password/onepasswor
 and [urfave/cli v3](https://cli.urfave.org). No credential caching, nothing
 written to disk.
 
+## Installation
+
+Prebuilt binaries are published for Linux, macOS, and Windows (amd64 and
+arm64):
+
+- **Homebrew**: `brew install seanlatimer/tap/op-s3-credentials`
+- **Scoop**: `scoop bucket add seanlatimer https://github.com/seanlatimer/scoop-bucket && scoop install op-s3-credentials`
+- **mise**: `mise use -g ubi:seanlatimer/op-s3-credentials`
+- **Manual**: download from [releases](https://github.com/seanlatimer/op-s3-credentials/releases) — archives are named `op-s3-credentials_<os>_<arch>`
+
+Or from source: `go install github.com/seanlatimer/op-s3-credentials/cmd/op-s3-credentials@latest`.
+
 ## 1Password setup
 
 1. Install the 1Password desktop app, sign in, and enable
@@ -102,6 +114,25 @@ is disabled). `--timeout` is enforced twice: as a context deadline on the SDK
 calls, and as a watchdog that terminates the process with an explanatory
 message even if the block ignores cancellation — so the AWS CLI never waits on
 a stuck helper forever.
+
+## Verifying releases
+
+Every release ships `checksums.txt`, a keyless cosign signature and
+certificate (`checksums.txt.sig` / `checksums.txt.pem`), and a
+`packslip.sigstore.json` manifest — all signed by this repository's GitHub
+Actions identity:
+
+```sh
+cosign verify-blob \
+  --certificate checksums.txt.pem \
+  --signature checksums.txt.sig \
+  --certificate-identity-regexp "https://github.com/SeanLatimer/op-s3-credentials" \
+  --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+  checksums.txt
+```
+
+mise reads the packslip manifest directly when installing, selecting and
+verifying artifacts from the signed digests instead of filename conventions.
 
 ## Development
 
