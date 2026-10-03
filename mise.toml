@@ -27,3 +27,13 @@ run = "gofmt -w ."
 [tasks.install]
 description = "Install the binary to GOBIN"
 run = "go install ./cmd/op-s3-credentials"
+
+[tasks."release:preview"]
+description = "Preview the next version and changelog (no files, tags, or releases written)"
+tools = { git-cliff = "2.14.2" }
+run = "go run ./tools/release -preview"
+
+[tasks."release:prepare"]
+description = "Prepare CHANGELOG.md on develop; never commits, tags, or publishes"
+tools = { git-cliff = "2.14.2" }
+run = "go run ./tools/release"

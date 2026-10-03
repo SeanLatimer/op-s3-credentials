@@ -81,26 +81,8 @@ signs:
       - '${artifact}'
 
 changelog:
-  use: github
-  sort: asc
-  abbrev: 7
-  groups:
-    - title: 'Features'
-      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
-      order: 0
-    - title: 'Bug Fixes'
-      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
-      order: 1
-    - title: 'Documentation'
-      regexp: '^.*?docs(\([[:word:]]+\))??!?:.+$'
-      order: 2
-    - title: 'Other'
-      order: 999
-  filters:
-    exclude:
-      - '^test:'
-      - '^chore:'
-      - '^ci:'
+  # The release workflow supplies git-cliff output via --release-notes.
+  disable: true
 
 homebrew_casks:
   - name: op-s3-credentials

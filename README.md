@@ -140,14 +140,19 @@ Tooling is managed with [mise](https://mise.jdx.dev):
 
 ```
 mise run build          # debug binary into bin/
-mise run build:release  # optimized binary (bump -X main.version when releasing)
+mise run snapshot       # local release snapshot (full matrix requires macOS)
 mise run test           # unit tests
 mise run lint           # golangci-lint
 mise run fmt            # gofmt
 mise run install        # go install
+mise run release:preview # propose version/changelog without writing
+mise run release:prepare # write changelog only; never publishes
 ```
 
 Building for Windows needs no C toolchain (no CGO). Cross-compiling the
 desktop-app integration for Linux/macOS requires CGO; a plain
 `CGO_ENABLED=0` linux build also works but only supports service-account
 auth.
+
+See [the release guide](docs/releasing.md) for version policy, signed tags,
+publication, and optional free editorial release notes.

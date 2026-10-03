@@ -1,0 +1,20 @@
+context = """
+op-s3-credentials is a small Go CLI implementing AWS credential_process using
+the official 1Password SDK. Users are infrastructure engineers. Desktop-app
+and service-account authentication have different account requirements.
+"""
+system_extra = """
+Write concise, practical release notes without marketing language or emojis.
+Describe only verified user-visible changes in the release range.
+Highlight breaking changes, affected users, and concrete migration steps.
+Do not invent authentication behavior, security guarantees, or new capabilities.
+Omit routine CI, formatting, and dependency maintenance unless users are affected.
+Do not include installation instructions, sponsorship text, or a release title
+inside the release body; the release workflow preserves the factual notes and
+installation/verification information separately.
+"""
+
+[defaults]
+model = "nvidia/nemotron-3-ultra-550b-a55b:free"
+repo = "SeanLatimer/op-s3-credentials"
+max_tokens = 4096
