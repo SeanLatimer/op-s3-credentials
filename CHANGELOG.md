@@ -6,6 +6,13 @@ and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-03
+
+### Fixed
+
+- Use Cosign signature bundles for checksum signing and verification, fixing
+  the signing failure that prevented `v0.1.0` from publishing release artifacts.
+
 ## [0.1.0] - 2026-10-03
 
 ### Added
