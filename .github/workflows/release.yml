@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  attestations: write # packslip build provenance for artifacts built in this job
   id-token: write # keyless cosign signing + packslip sigstore bundle
 
 concurrency:

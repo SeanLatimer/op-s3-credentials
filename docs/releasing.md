@@ -144,3 +144,22 @@ availability and quotas may change, and generation can consume multiple requests
   deliberately, or ship a new patch tag when source changes are necessary.
 - Editorial-only failures require no release repair: git-cliff notes are already
   present. Retrying only the editorial job can replace its managed section.
+
+### Recover a missing packslip manifest
+
+If archives and their checksum bundle published but packslip failed, do not rerun
+the full release job. After review and explicit recovery approval, run **recover
+packslip** from the Actions tab on `main`, passing the existing release tag (for
+example, `v0.1.1`). The workflow verifies that the stable release exists, its
+tagged commit belongs to `main`, and no packslip manifest already exists.
+
+It downloads the six existing archives, verifies the checksum bundle against the
+original release workflow/tag identity, checks every archive digest, and uploads
+only `packslip.sigstore.json`. The manifest records the original tagged source
+commit but is signed by the recovery workflow identity. It does not create build
+provenance attestations: downloading binaries is not building them. Future normal
+release jobs retain build provenance with `attestations: write` permission.
+
+Confirm the recovery run succeeded and verify the uploaded manifest before using
+it. This operation does not rebuild, update package repositories, change tags,
+regenerate release notes, or run optional editorial generation.
