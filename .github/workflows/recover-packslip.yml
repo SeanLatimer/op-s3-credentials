@@ -45,12 +45,12 @@ jobs:
           ' "$RUNNER_TEMP/recovery-release.json"
           mkdir "$RUNNER_TEMP/packslip-recovery"
           cd "$RUNNER_TEMP/packslip-recovery"
-          gh release download "$RELEASE_TAG" --pattern checksums.txt --pattern checksums.txt.sigstore.json
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern checksums.txt --pattern checksums.txt.sigstore.json
           for os in linux darwin windows; do
             extension=tar.gz
             if [[ "$os" == windows ]]; then extension=zip; fi
             for arch in amd64 arm64; do
-              gh release download "$RELEASE_TAG" --pattern "op-s3-credentials_${os}_${arch}.${extension}"
+              gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "op-s3-credentials_${os}_${arch}.${extension}"
             done
           done
           echo "commit=$commit" >> "$GITHUB_OUTPUT"
