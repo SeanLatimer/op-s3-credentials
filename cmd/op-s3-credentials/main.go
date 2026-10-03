@@ -6,8 +6,8 @@ import (
 	"context"
 	"os"
 
-	"github.com/seanlatimer/op-s3-credentials/internal/cli"
-	"github.com/seanlatimer/op-s3-credentials/internal/op"
+	"github.com/SeanLatimer/op-s3-credentials/internal/cli"
+	"github.com/SeanLatimer/op-s3-credentials/internal/op"
 )
 
 // version is overridden at build time via -ldflags "-X main.version=...".

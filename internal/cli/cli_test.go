@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/seanlatimer/op-s3-credentials/internal/op"
+	"github.com/SeanLatimer/op-s3-credentials/internal/op"
 )
 
 type fakeFetcher struct {

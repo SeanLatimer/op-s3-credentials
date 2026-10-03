@@ -16,6 +16,18 @@ Built on the official [1Password Go SDK](https://github.com/1Password/onepasswor
 and [urfave/cli v3](https://cli.urfave.org). No credential caching, nothing
 written to disk.
 
+## Installation
+
+Prebuilt binaries are published for Linux, macOS, and Windows (amd64 and
+arm64):
+
+- **Homebrew**: `brew install SeanLatimer/tap/op-s3-credentials`
+- **Scoop**: `scoop bucket add SeanLatimer https://github.com/SeanLatimer/scoop-bucket && scoop install op-s3-credentials`
+- **mise**: `mise use -g ubi:SeanLatimer/op-s3-credentials`
+- **Manual**: download from [releases](https://github.com/SeanLatimer/op-s3-credentials/releases) — archives are named `op-s3-credentials_<os>_<arch>`
+
+Or from source: `go install github.com/SeanLatimer/op-s3-credentials/cmd/op-s3-credentials@latest`.
+
 ## 1Password setup
 
 1. Install the 1Password desktop app, sign in, and enable
@@ -103,20 +115,44 @@ calls, and as a watchdog that terminates the process with an explanatory
 message even if the block ignores cancellation — so the AWS CLI never waits on
 a stuck helper forever.
 
+## Verifying releases
+
+Every release ships `checksums.txt`, a keyless cosign signature and
+certificate (`checksums.txt.sig` / `checksums.txt.pem`), and a
+`packslip.sigstore.json` manifest — all signed by this repository's GitHub
+Actions identity:
+
+```sh
+cosign verify-blob \
+  --certificate checksums.txt.pem \
+  --signature checksums.txt.sig \
+  --certificate-identity-regexp "https://github.com/SeanLatimer/op-s3-credentials" \
+  --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+  checksums.txt
+```
+
+mise reads the packslip manifest directly when installing, selecting and
+verifying artifacts from the signed digests instead of filename conventions.
+
 ## Development
 
 Tooling is managed with [mise](https://mise.jdx.dev):
 
 ```
 mise run build          # debug binary into bin/
-mise run build:release  # optimized binary (bump -X main.version when releasing)
+mise run snapshot       # local release snapshot (full matrix requires macOS)
 mise run test           # unit tests
 mise run lint           # golangci-lint
 mise run fmt            # gofmt
 mise run install        # go install
+mise run release:preview # propose version/changelog without writing
+mise run release:prepare # write changelog only; never publishes
 ```
 
 Building for Windows needs no C toolchain (no CGO). Cross-compiling the
 desktop-app integration for Linux/macOS requires CGO; a plain
 `CGO_ENABLED=0` linux build also works but only supports service-account
 auth.
+
+See [the release guide](docs/releasing.md) for version policy, signed tags,
+publication, and optional free editorial release notes.

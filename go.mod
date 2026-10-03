@@ -1,4 +1,4 @@
-module github.com/seanlatimer/op-s3-credentials
+module github.com/SeanLatimer/op-s3-credentials
 
 go 1.27.0
 

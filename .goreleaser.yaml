@@ -1,0 +1,121 @@
+# GoReleaser configuration for op-s3-credentials.
+#
+# Desktop-app authentication requires CGO on darwin/linux. Go's darwin cgo
+# links Apple frameworks (CoreFoundation, Security), so darwin must be built
+# natively on a macOS runner with clang; cross-compiling it needs a full
+# macOS SDK. Linux cross-compiles fine with zig cc (glibc only), and windows
+# needs no CGO at all: the desktop integration is behind a `cgo || windows`
+# build tag. The release workflow therefore runs on macOS.
+version: 2
+
+project_name: op-s3-credentials
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: linux
+    main: ./cmd/op-s3-credentials
+    binary: op-s3-credentials
+    goos: [linux]
+    goarch: [amd64, arm64]
+    env:
+      - CGO_ENABLED=1
+      - 'CC=zig cc -target {{ if eq .Arch "amd64" }}x86_64{{ else }}aarch64{{ end }}-linux-gnu'
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags: [-trimpath]
+    ldflags: ['-s -w -X main.version={{ .Version }}']
+
+  - id: darwin
+    main: ./cmd/op-s3-credentials
+    binary: op-s3-credentials
+    goos: [darwin]
+    goarch: [amd64, arm64]
+    env:
+      - CGO_ENABLED=1
+      - 'CC=clang {{ if eq .Arch "amd64" }}-arch x86_64 {{ end }}-mmacosx-version-min=11.0'
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags: [-trimpath]
+    ldflags: ['-s -w -X main.version={{ .Version }}']
+
+  - id: windows
+    main: ./cmd/op-s3-credentials
+    binary: op-s3-credentials
+    goos: [windows]
+    goarch: [amd64, arm64]
+    env:
+      - CGO_ENABLED=0
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags: [-trimpath]
+    ldflags: ['-s -w -X main.version={{ .Version }}']
+
+archives:
+  - ids: [linux, darwin, windows]
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
+    files: [LICENSE, README.md]
+
+checksum:
+  name_template: 'checksums.txt'
+
+# Keyless cosign signing of the checksum file; the signature and certificate
+# are uploaded beside it. packslip separately signs every artifact's digest
+# with the same workflow identity.
+signs:
+  - cmd: cosign
+    artifacts: checksum
+    signature: '${artifact}.sig'
+    certificate: '${artifact}.pem'
+    output: true
+    args:
+      - sign-blob
+      - '--yes'
+      - '--output-signature'
+      - '${signature}'
+      - '--output-certificate'
+      - '${certificate}'
+      - '${artifact}'
+
+changelog:
+  # The release workflow supplies git-cliff output via --release-notes.
+  disable: true
+
+homebrew_casks:
+  - name: op-s3-credentials
+    repository:
+      owner: SeanLatimer
+      name: homebrew-tap
+      token: '{{ .Env.TAP_GITHUB_TOKEN }}'
+    homepage: https://github.com/SeanLatimer/op-s3-credentials
+    description: AWS credential_process helper backed by 1Password
+    # Binaries are not Apple-signed/notarized; clear the quarantine bit so
+    # macOS does not report the binary as damaged.
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/op-s3-credentials"]
+          end
+    commit_author:
+      name: goreleaser-bot
+      email: bot@goreleaser.com
+
+scoops:
+  - repository:
+      owner: SeanLatimer
+      name: scoop-bucket
+      token: '{{ .Env.TAP_GITHUB_TOKEN }}'
+    homepage: https://github.com/SeanLatimer/op-s3-credentials
+    description: AWS credential_process helper backed by 1Password
+    license: MIT
+    commit_author:
+      name: goreleaser-bot
+      email: bot@goreleaser.com
+
+release:
+  prerelease: auto
+  make_latest: true
